@@ -24,17 +24,32 @@
 
 from voltdbclient import *
 
-client = FastSerializer("localhost", 21212)
-proc = VoltProcedure( client, "Insert", [FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING] )
+#client = FastSerializer("localhost", 21212)
+#proc = VoltProcedure( client, "Insert", [FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING] )
+#
+#
+#proc = VoltProcedure( client, "Select", [FastSerializer.VOLTTYPE_STRING])
+#response = proc.call( ["Spanish"] )
+#
+#for x in response.tables:
+#    print(x)
 
-proc.call([ "English", "Hello", "World" ])
-proc.call([ "French" , "Bonjour", "Monde" ])
-proc.call([ "Spanish", "Hola", "Mundo" ])
-proc.call([ "Danish", "Hej", "Verden" ])
-proc.call([ "Italian", "Ciao", "Mondo" ])
 
-proc = VoltProcedure( client, "Select", [FastSerializer.VOLTTYPE_STRING])
-response = proc.call( ["Spanish"] )
+def run():
+    client = FastSerializer("localhost", 21212)
+    id = 1
+    proc = VoltProcedure( client, "Insert", [FastSerializer.VOLTTYPE_INTEGER, FastSerializer.VOLTTYPE_VARBINARY] )
+    path = './archive/CAT_00/'
+    for filename in os.listdir(path):
+        if filename.endswith("jpg"):
+            file = path + filename
+            with open(file, 'rb') as f:
+                contents = f.read()
+                #print(type(contents))
+                proc.call([id, contents])
+                id += 1
 
-for x in response.tables:
-    print(x)
+
+
+if __name__=='__main__':
+    run()
