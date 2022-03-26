@@ -43,7 +43,7 @@ def insert():
     proc = VoltProcedure( client, "Insert", [FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING,
                                             FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING])
 
-    N_FILES = 10
+    N_FILES = 10000
     PROCESSED_FILES = 0
     path = './catfolder/'
     cell_limit = 1000000
