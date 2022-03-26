@@ -28,20 +28,34 @@ from voltdbclient import *
 import math
 
 def insert():
-    """ Insert all jpg files from specified folder into VoltDB """
+    """ Insert all jpg files from specified folder into VoltDB.
+        The method is customized to fit a Table Schema:
+        TABLE CAT (
+            FILENAME VARCHAR(25) NOT NULL,
+            S0 VARCHAR(1000000 BYTES) NOT NULL,
+            S1 VARCHAR(1000000 BYTES),
+            S2 VARCHAR(97000 BYTES),
+            PRIMARY KEY (FILENAME)
+        );
+    """
+
     client = FastSerializer("localhost", 21212)
     proc = VoltProcedure( client, "Insert", [FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING,
                                             FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING])
+
+    N_FILES = 10
+    PROCESSED_FILES = 0
     path = './catfolder/'
     cell_limit = 1000000
+    row_limit = 2097000
     for filename in os.listdir(path):
-        if filename.endswith("jpg"):
+        if filename.endswith("jpg") and PROCESSED_FILES < N_FILES:
             file = path + filename
             with open(file, 'rb') as f:
                 contents = f.read()
                 str_contents = str(contents)
                 file_size = sys.getsizeof(str_contents)
-                if file_size < 2097000:
+                if file_size < row_limit:
                     s0 = str_contents[0:cell_limit]
                     if file_size > cell_limit:
                         s1 = str_contents[cell_limit:2*cell_limit]
@@ -52,6 +66,7 @@ def insert():
                     else:
                         s2 = ""
                     proc.call([filename, s0, s1, s2])
+                    PROCESSED_FILES += 1
 
 def select():
     client = FastSerializer("localhost", 21212)
