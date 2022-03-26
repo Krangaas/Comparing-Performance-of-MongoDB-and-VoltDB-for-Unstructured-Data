@@ -33,7 +33,7 @@ def insert():
     proc = VoltProcedure( client, "Insert", [FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING,
                                             FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING])
     path = './catfolder/'
-    row_limit = 1000000
+    cell_limit = 1000000
     for filename in os.listdir(path):
         if filename.endswith("jpg"):
             file = path + filename
@@ -42,13 +42,13 @@ def insert():
                 str_contents = str(contents)
                 file_size = sys.getsizeof(str_contents)
                 if file_size < 2097000:
-                    s0 = str_contents[0:row_limit]
-                    if file_size > row_limit:
-                        s1 = str_contents[row_limit:2*row_limit]
+                    s0 = str_contents[0:cell_limit]
+                    if file_size > cell_limit:
+                        s1 = str_contents[cell_limit:2*cell_limit]
                     else:
                         s1 = ""
-                    if file_size > 2*row_limit:
-                        s2 = str_contents[2*row_limit:file_size]
+                    if file_size > 2*cell_limit:
+                        s2 = str_contents[2*cell_limit:file_size]
                     else:
                         s2 = ""
                     proc.call([filename, s0, s1, s2])
