@@ -8,6 +8,8 @@ from PIL import Image
 import time
 import os
 
+
+path = './catfolder/'
 #N_FILES = int(sys.argv[1])
 
 def vdb_insert(N_FILES):
@@ -26,7 +28,6 @@ def vdb_insert(N_FILES):
     proc = VoltProcedure( client, "Insert", [FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING,
                                             FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING])
 
-    path = './catfolder/'
     cell_limit = 1000000
     row_limit = 2097000
     PROCESSED_FILES = 0
@@ -57,10 +58,11 @@ def vdb_insert(N_FILES):
     tot_time = (t2-t1)
     return tot_time
 
+
 def vdb_select(N_FILES):
     client = FastSerializer("localhost", 21212)
     proc = VoltProcedure( client, "Select", [FastSerializer.VOLTTYPE_STRING])
-    path = './catfolder/'
+
     fetched_files = 0
     t1 = time.time()
     for filename in os.listdir(path):
@@ -71,12 +73,38 @@ def vdb_select(N_FILES):
     tot_time = t2-t1
     return tot_time
 
-def vdb_delete():
+
+def vdb_multiselect():
+    t1 = time.time()
+    os.system("sqlcmd --query='SELECT * FROM CAT;' > /dev/null")
+    t2 = time.time()
+    tot_time = t2-t1
+    return tot_time
+
+def vdb_delete(N_FILES):
+    client = FastSerializer("localhost", 21212)
+    proc = VoltProcedure( client, "Delete", [FastSerializer.VOLTTYPE_STRING])
+
+    deleted_files = 0
+    t1 = time.time()
+    for filename in os.listdir(path):
+        if deleted_files < N_FILES:
+            response = proc.call([filename])
+    t2 = time.time()
+    tot_time = t2-t1
+    return tot_time
+
+
+
+def vdb_multidelete():
     t1 = time.time()
     os.system("sqlcmd --query='DELETE FROM CAT;' > /dev/null")
     t2 = time.time()
     tot_time = t2-t1
     return tot_time
+
+
+
 
 def plot_img(data):
     cat_pic = bytes.fromhex(data.tables[0].tuples[0][1])
@@ -85,5 +113,4 @@ def plot_img(data):
     plt.show()
 
 #if __name__=='__main__':
-#    insert()
-    #select()
+#    vdb_insert(3)
