@@ -7,20 +7,18 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import time
 
+PATH = './catfolder/'
 
-N_FILES = int(sys.argv[1])
+def mdb_insert(N_FILES):
 
-def insert():
     connection = MongoClient("localhost", 27017)
     db = connection['CAT']
     images = db.images
-    path = './catfolder/'
-
     PROCESSED_FILES = 0
     t1 = time.time()
-    for filename in os.listdir(path):
+    for filename in os.listdir(PATH):
         if filename.endswith("jpg") and PROCESSED_FILES < N_FILES:
-            file = path + filename
+            file = PATH + filename
             with open(file, 'rb') as f:
                 contents = f.read()
                 image = {"filename":filename, 'images':contents}
@@ -28,9 +26,26 @@ def insert():
                 PROCESSED_FILES += 1
     t2 = time.time()
     tot_time = t2 - t1
-    print(tot_time)
+    #connection.drop_database('CAT')
+    return tot_time
 
-def select():
+def mdb_select(N_FILES):
+    connection = MongoClient("localhost", 27017)
+    db = connection['CAT']
+    images = db.images
+
+    selected_files = 0
+    t1 = time.time()
+    for filename in os.listdir(PATH):
+        if selected_files < N_FILES:
+            image={'filename':filename}
+            response = images.find_one(image)
+            selected_files += 1
+    t2 = time.time()
+    tot_time = t2 - t1
+    return tot_time
+
+def mdb_multiselect():
     connection = MongoClient("localhost", 27017)
     db = connection['CAT']
     images = db.images
@@ -38,9 +53,26 @@ def select():
     response = images.find()
     t2 = time.time()
     tot_time = t2 - t1
-    print(tot_time)
+    return tot_time
 
+def mdb_delete(N_FILES):
+    connection = MongoClient("localhost", 27017)
+    db = connection['CAT']
+    images = db.images
+    deleted_files = 0
+    for filename in os.listdir(PATH):
+        if deleted_files < N_FILES:
+            image={'filename':filename}
+            response = images.find_one_and_delete(image)
+            deleted_files += 1
 
+def mdb_multidelete():
+    connection = MongoClient("localhost", 27017)
+    t1 = time.time()
+    connection.drop_database('CAT')
+    t2 = time.time()
+    tot_time = t2 - t1
+    return tot_time
 
 def plot_img(data):
     pil_image = Image.open(io.BytesIO(data["images"]))
@@ -50,5 +82,8 @@ def plot_img(data):
 
 
 if __name__=='__main__':
-    insert()
+    #mdb_insert(2)
+    #mdb_select(2)
+    #insert()
     #select()
+    mdb_delete(1)
