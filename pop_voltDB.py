@@ -1,27 +1,3 @@
-#!/usr/bin/env python3
-
-# This file is part of VoltDB.
-# Copyright (C) 2008-2021 VoltDB Inc.
-#
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-# OTHER DEALINGS IN THE SOFTWARE.
-
 from importlib.resources import path
 from matplotlib.pyplot import close
 from numpy import size
@@ -30,10 +6,11 @@ import io
 import matplotlib.pyplot as plt
 from PIL import Image
 import time
+import os
 
-N_FILES = int(sys.argv[1])
+#N_FILES = int(sys.argv[1])
 
-def insert():
+def vdb_insert(N_FILES):
     """ Insert all jpg files from specified folder into VoltDB.
         The method is customized to fit a Table Schema:
         TABLE CAT (
@@ -78,9 +55,9 @@ def insert():
 
     t2 = time.time()
     tot_time = (t2-t1)
-    print(tot_time)
+    return tot_time
 
-def select():
+def vdb_select(N_FILES):
     client = FastSerializer("localhost", 21212)
     proc = VoltProcedure( client, "Select", [FastSerializer.VOLTTYPE_STRING])
     path = './catfolder/'
@@ -90,12 +67,16 @@ def select():
         if fetched_files < N_FILES:
             response = proc.call([filename])
             fetched_files += 1
-            #if fetched_files % 50 == 0:
-            #    plot_img(response)
     t2 = time.time()
     tot_time = t2-t1
-    print(tot_time)
-    #print("Selected N files: ", fetched_files)
+    return tot_time
+
+def vdb_delete():
+    t1 = time.time()
+    os.system("sqlcmd --query='DELETE FROM CAT;' > /dev/null")
+    t2 = time.time()
+    tot_time = t2-t1
+    return tot_time
 
 def plot_img(data):
     cat_pic = bytes.fromhex(data.tables[0].tuples[0][1])
@@ -103,6 +84,6 @@ def plot_img(data):
     plt.imshow(pil_img)
     plt.show()
 
-if __name__=='__main__':
-    #insert()
+#if __name__=='__main__':
+#    insert()
     #select()
