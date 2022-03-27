@@ -2,29 +2,50 @@
 import sys
 from pymongo import MongoClient
 import os
+import io
+import matplotlib.pyplot as plt
+from PIL import Image
 
-def run():
+
+N_FILES = int(sys.argv[1])
+
+def insert():
     connection = MongoClient("localhost", 27017)
     db = connection['CAT']
     images = db.images
-
-    N_FILES = 1000
-    PROCESSED_FILES = 0
-    voltdb_size_limit = 2097000
     path = './catfolder/'
 
+    PROCESSED_FILES = 0
     for filename in os.listdir(path):
         if filename.endswith("jpg") and PROCESSED_FILES < N_FILES:
             file = path + filename
             with open(file, 'rb') as f:
                 contents = f.read()
-                str_contents = str(contents)
-                file_size = sys.getsizeof(str_contents)
-                if file_size < voltdb_size_limit:
-                    image = {"filename":filename, 'images':contents}
-                    images.insert_one(image).inserted_id
-                    PROCESSED_FILES += 1
+                image = {"filename":filename, 'images':contents}
+                images.insert_one(image).inserted_id
+                PROCESSED_FILES += 1
+
+def select():
+    connection = MongoClient("localhost", 27017)
+    db = connection['CAT']
+    images = db.images
+    response = images.find_one()
+    print(response)
+    pil_image = Image.open(io.BytesIO(response["images"]))
+    plt.imshow(pil_image)
+    plt.show()
+
+    #for x in response:
+    #    print(x)
+
+
+def plot_img(data):
+    pil_image = Image.open(io.BytesIO(data["images"]))
+    plt.imshow(pil_image)
+    plt.show()
+
 
 
 if __name__=='__main__':
-    run()
+    #insert()
+    select()
