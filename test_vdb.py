@@ -4,7 +4,7 @@ import subprocess
 from statistics import mean
 from pop_voltDB import *
 
-N_FILES = [1, 1000, 2000]#, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
+N_FILES = [1, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
 
 def single_op(tries=10):
     avg_write = []
@@ -66,19 +66,40 @@ def multi_op(tries=10):
     print(avg_delete)
 
 
+def show_cats(N):
+    """ Store, select, show and delete N cat images """
+    N = int(N)
+    os.system("voltdb init --force")
+    subprocess.Popen(["voltdb", "start"])
+    time.sleep(5)
+    os.system("sqlcmd < CAT_SETUP_TABLE")
+    vdb_insert(N)
+    vdb_select(N, do_show=True)
+    vdb_delete(N)
+    subprocess.call(["voltadmin", "shutdown"])
+
+
+def help_and_exit():
+    print("To Benchmark: 'python3 test_vdb.py [singe, multi]'")
+    print("To Show N cat images: 'python3 test_vdb.py cats N'")
+    exit(0)
+
+
 if __name__=='__main__':
     try:
         cmd = sys.argv[1]
     except:
-        print("To Use: 'python3 tester.py ARG'")
-        print("Valid inputs are: [singe, multi]")
-        exit(0)
+        help_and_exit()
 
     if cmd == "single":
         single_op()
     elif cmd == "multi":
         multi_op()
+    elif cmd == "cats":
+        try:
+            cmd2 = sys.argv[2]
+        except:
+            help_and_exit()
+        show_cats(cmd2)
     else:
-        print("To Use: 'python3 tester.py ARG'")
-        print("Valid inputs are: [singe, multi]")
-        exit(0)
+        help_and_exit()

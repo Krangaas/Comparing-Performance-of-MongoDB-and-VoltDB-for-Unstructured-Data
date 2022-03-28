@@ -10,6 +10,8 @@ import os
 
 
 path = './catfolder/'
+cell_limit = 1000000
+row_limit = 2097000
 #N_FILES = int(sys.argv[1])
 
 def vdb_insert(N_FILES):
@@ -28,8 +30,6 @@ def vdb_insert(N_FILES):
     proc = VoltProcedure( client, "Insert", [FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING,
                                             FastSerializer.VOLTTYPE_STRING, FastSerializer.VOLTTYPE_STRING])
 
-    cell_limit = 1000000
-    row_limit = 2097000
     PROCESSED_FILES = 0
     t1 = time.time()
     for filename in os.listdir(path):
@@ -59,16 +59,19 @@ def vdb_insert(N_FILES):
     return tot_time
 
 
-def vdb_select(N_FILES):
+def vdb_select(N_FILES, do_show=False):
     client = FastSerializer("localhost", 21212)
     proc = VoltProcedure( client, "Select", [FastSerializer.VOLTTYPE_STRING])
 
-    fetched_files = 0
+    FETCHED_FILES = 0
     t1 = time.time()
     for filename in os.listdir(path):
-        if fetched_files < N_FILES:
+        if FETCHED_FILES < N_FILES:
             response = proc.call([filename])
-            fetched_files += 1
+            FETCHED_FILES += 1
+            if do_show:
+                processed_img = postprocess(response.tables[0].tuples[0])
+                plot_img(processed_img)
     t2 = time.time()
     tot_time = t2-t1
     return tot_time
@@ -85,15 +88,15 @@ def vdb_delete(N_FILES):
     client = FastSerializer("localhost", 21212)
     proc = VoltProcedure( client, "Delete", [FastSerializer.VOLTTYPE_STRING])
 
-    deleted_files = 0
+    DELETED_FILES = 0
     t1 = time.time()
     for filename in os.listdir(path):
-        if deleted_files < N_FILES:
+        if DELETED_FILES < N_FILES:
             response = proc.call([filename])
+            DELETED_FILES += 1
     t2 = time.time()
     tot_time = t2-t1
     return tot_time
-
 
 
 def vdb_multidelete():
@@ -104,13 +107,14 @@ def vdb_multidelete():
     return tot_time
 
 
-
-
-def plot_img(data):
-    cat_pic = bytes.fromhex(data.tables[0].tuples[0][1])
-    pil_img = Image.open(io.BytesIO(cat_pic))
+def plot_img(image):
+    pil_img = Image.open(io.BytesIO(image))
     plt.imshow(pil_img)
     plt.show()
 
-#if __name__=='__main__':
-#    vdb_insert(3)
+
+def postprocess(data):
+    data = [x for x in data[1:] if x is not None]
+    data = ''.join(data)
+    data = bytes.fromhex(data)
+    return data
