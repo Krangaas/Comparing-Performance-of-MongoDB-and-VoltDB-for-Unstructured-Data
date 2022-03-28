@@ -29,7 +29,7 @@ def mdb_insert(N_FILES):
     #connection.drop_database('CAT')
     return tot_time
 
-def mdb_select(N_FILES):
+def mdb_select(N_FILES, do_show = False):
     connection = MongoClient("localhost", 27017)
     db = connection['CAT']
     images = db.images
@@ -41,6 +41,8 @@ def mdb_select(N_FILES):
             image={'filename':filename}
             response = images.find_one(image)
             selected_files += 1
+            if do_show:
+                plot_img(response)
     t2 = time.time()
     tot_time = t2 - t1
     return tot_time
@@ -60,11 +62,15 @@ def mdb_delete(N_FILES):
     db = connection['CAT']
     images = db.images
     deleted_files = 0
+    t1 = time.time()
     for filename in os.listdir(PATH):
         if deleted_files < N_FILES:
             image={'filename':filename}
             response = images.find_one_and_delete(image)
             deleted_files += 1
+    t2 = time.time()
+    tot_time = t2 - t1
+    return tot_time
 
 def mdb_multidelete():
     connection = MongoClient("localhost", 27017)
@@ -79,11 +85,3 @@ def plot_img(data):
     plt.imshow(pil_image)
     plt.show()
 
-
-
-if __name__=='__main__':
-    #mdb_insert(2)
-    #mdb_select(2)
-    #insert()
-    #select()
-    mdb_delete(1)
