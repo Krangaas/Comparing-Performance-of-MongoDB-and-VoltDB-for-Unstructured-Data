@@ -22,7 +22,7 @@ def single_op(iterations=10):
         for i in range(iterations):
             print("     iteration", i)
             write_times.append(mdb_insert(N))
-            read_times.append(mdb_select(N, do_show=True))
+            read_times.append(mdb_select(N, do_show=False))
             delete_times.append(mdb_delete(N))
         avg_write.append(mean(write_times))
         avg_read.append(mean(read_times))
