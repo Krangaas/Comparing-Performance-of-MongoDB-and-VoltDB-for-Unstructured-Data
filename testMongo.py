@@ -3,7 +3,7 @@ import time
 from pop_mongoDB import *
 from statistics import mean
 
-N_FILES = [100, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
+N_FILES = [1, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
 iterations = 10
 avg_write = []
 avg_read = []
@@ -32,7 +32,7 @@ def single_op(iterations=10):
     print("avg_read : ", avg_read)
     print("avg_del  : ", avg_delete)
 
-def multi_op(iterations=10):
+def multi_op(iterations=3):
     avg_write = []
     avg_read = []
     avg_delete = []
@@ -44,10 +44,10 @@ def multi_op(iterations=10):
         for i in range(iterations):
             print("     iteration", i)
             write_times.append(mdb_insert(N))
-            read_times.append(mdb_multiselect())
+            #read_times.append(mdb_multiselect())
             delete_times.append(mdb_multidelete())
         avg_write.append(mean(write_times))
-        avg_read.append(mean(read_times))
+        #avg_read.append(mean(read_times))
         avg_delete.append(mean(delete_times))
 
     print("avg_write: ", avg_write)
@@ -58,7 +58,7 @@ if __name__=='__main__':
     try:
         cmd = sys.argv[1]
     except:
-        print("To Use: 'python3 tester.py ARG'")
+        print("To Use: 'python3 testMongo.py ARG'")
         print("Valid inputs are: [singe, multi]")
         exit(0)
 
@@ -67,6 +67,6 @@ if __name__=='__main__':
     elif cmd == 'multi':
         multi_op()
     else:
-        print("To Use: 'python3 tester.py ARG'")
+        print("To Use: 'python3 testMongo.py ARG'")
         print("Valid inputs are: [singe, multi]")
         exit(0)

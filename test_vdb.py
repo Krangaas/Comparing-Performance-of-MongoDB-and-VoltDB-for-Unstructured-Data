@@ -36,7 +36,7 @@ def single_op(tries=10):
     print(avg_delete)
 
 
-def multi_op(tries=10):
+def multi_op(tries=3):
     avg_write = []
     avg_read = []
     avg_delete = []
@@ -54,10 +54,10 @@ def multi_op(tries=10):
         for i in range(tries):
             print("     iteration", i)
             write_times.append(vdb_insert(N))
-            read_times.append(vdb_multiselect())
+            #read_times.append(vdb_multiselect())
             delete_times.append(vdb_multidelete())
         avg_write.append(mean(write_times))
-        avg_read.append(mean(read_times))
+        #avg_read.append(mean(read_times))
         avg_delete.append(mean(delete_times))
 
     subprocess.call(["voltadmin", "shutdown"], stdout=subprocess.DEVNULL)

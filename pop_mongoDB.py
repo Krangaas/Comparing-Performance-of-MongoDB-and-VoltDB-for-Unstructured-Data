@@ -74,8 +74,10 @@ def mdb_delete(N_FILES):
 
 def mdb_multidelete():
     connection = MongoClient("localhost", 27017)
+    db = connection['CAT']
+    images = db['images']
     t1 = time.time()
-    connection.drop_database('CAT')
+    images.delete_many({})
     t2 = time.time()
     tot_time = t2 - t1
     return tot_time
@@ -84,4 +86,3 @@ def plot_img(data):
     pil_image = Image.open(io.BytesIO(data["images"]))
     plt.imshow(pil_image)
     plt.show()
-

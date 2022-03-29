@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import time
 import os
+import subprocess
 
 
 path = './catfolder/'
