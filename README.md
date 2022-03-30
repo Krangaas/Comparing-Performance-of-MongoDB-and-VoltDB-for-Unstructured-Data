@@ -1,5 +1,11 @@
 # INF-3701-Assignment-2
 
+### Demonstration:
+A simple demonstration can be found here:
+```
+https://youtu.be/1atx4SlLoTQ
+```
+
 The following scripts require both VoltDB and MongoDB to be installed. The media files should be extracted to a folder named *catfolder* in the same directory as the scripts.
 
 
