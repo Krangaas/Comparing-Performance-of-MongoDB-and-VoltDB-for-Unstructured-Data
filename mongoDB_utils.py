@@ -10,7 +10,7 @@ import time
 PATH = './catfolder/'
 
 def mdb_insert(N_FILES):
-
+    """ Insert N files into the database, one at a time. """
     connection = MongoClient("localhost", 27017)
     db = connection['CAT']
     images = db.images
@@ -26,10 +26,14 @@ def mdb_insert(N_FILES):
                 PROCESSED_FILES += 1
     t2 = time.time()
     tot_time = t2 - t1
-    #connection.drop_database('CAT')
     return tot_time
 
+
 def mdb_select(N_FILES, do_show = False):
+    """
+    Select N files from the database, one at a time.
+    Enable do_show to display the images.
+    """
     connection = MongoClient("localhost", 27017)
     db = connection['CAT']
     images = db.images
@@ -47,7 +51,9 @@ def mdb_select(N_FILES, do_show = False):
     tot_time = t2 - t1
     return tot_time
 
+
 def mdb_multiselect():
+    """ Select multiple files from the database at the same time. """
     connection = MongoClient("localhost", 27017)
     db = connection['CAT']
     images = db.images
@@ -57,7 +63,9 @@ def mdb_multiselect():
     tot_time = t2 - t1
     return tot_time
 
+
 def mdb_delete(N_FILES):
+    """ Delete N files from the database, one at a time. """
     connection = MongoClient("localhost", 27017)
     db = connection['CAT']
     images = db.images
@@ -72,7 +80,9 @@ def mdb_delete(N_FILES):
     tot_time = t2 - t1
     return tot_time
 
+
 def mdb_multidelete():
+    """ Delete multiple files from the database at the same time. """
     connection = MongoClient("localhost", 27017)
     db = connection['CAT']
     images = db['images']
@@ -82,7 +92,9 @@ def mdb_multidelete():
     tot_time = t2 - t1
     return tot_time
 
+
 def plot_img(data):
+    """ Plot the input image. """
     pil_image = Image.open(io.BytesIO(data["images"]))
     plt.imshow(pil_image)
     plt.show()

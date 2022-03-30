@@ -1,15 +1,11 @@
 import os, subprocess
-import time
-from pop_mongoDB import *
+from mongoDB_utils import *
 from statistics import mean
 
 N_FILES = [1, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
-iterations = 10
-avg_write = []
-avg_read = []
-avg_delete = []
 
 def single_op(iterations=10):
+    """ Store, select and delete N cat images with single-operations. """
     avg_write = []
     avg_read = []
     avg_delete = []
@@ -32,9 +28,11 @@ def single_op(iterations=10):
     print("avg_read : ", avg_read)
     print("avg_del  : ", avg_delete)
 
+
 def multi_op(iterations=3):
+    """ Store and delete N cat images with multi-operations."""
     avg_write = []
-    avg_read = []
+    #avg_read = []
     avg_delete = []
 
     for N in N_FILES:
@@ -51,22 +49,40 @@ def multi_op(iterations=3):
         avg_delete.append(mean(delete_times))
 
     print("avg_write: ", avg_write)
-    print("avg_read : ", avg_read)
+    #print("avg_read : ", avg_read)
     print("avg_del  : ", avg_delete)
+
+
+def show_cats(N):
+    """ Store, select, show and delete N cat images. """
+    N = int(N)
+    mdb_insert(N)
+    mdb_select(N, do_show=True)
+    mdb_delete(N)
+
+
+def help_and_exit():
+    """ Display help text and exit. """
+    print("To Benchmark: 'python3 test_mongoDB.py [singe, multi]'")
+    print("To Show N cat images: 'python3 test_mongoDB.py cats N'")
+    exit(0)
+
 
 if __name__=='__main__':
     try:
         cmd = sys.argv[1]
     except:
-        print("To Use: 'python3 testMongo.py ARG'")
-        print("Valid inputs are: [singe, multi]")
-        exit(0)
+        help_and_exit()
 
-    if cmd == 'single':
+    if cmd == "single":
         single_op()
-    elif cmd == 'multi':
+    elif cmd == "multi":
         multi_op()
+    elif cmd == "cats":
+        try:
+            cmd2 = sys.argv[2]
+        except:
+            help_and_exit()
+        show_cats(cmd2)
     else:
-        print("To Use: 'python3 testMongo.py ARG'")
-        print("Valid inputs are: [singe, multi]")
-        exit(0)
+        help_and_exit()

@@ -9,14 +9,12 @@ import time
 import os
 import subprocess
 
-
 path = './catfolder/'
 cell_limit = 1000000
 row_limit = 2097000
-#N_FILES = int(sys.argv[1])
 
 def vdb_insert(N_FILES):
-    """ Insert all jpg files from specified folder into VoltDB.
+    """ Insert N files into the database, one at a time.
         The method is customized to fit a Table Schema:
         TABLE CAT (
             FILENAME VARCHAR(25) NOT NULL,
@@ -61,6 +59,10 @@ def vdb_insert(N_FILES):
 
 
 def vdb_select(N_FILES, do_show=False):
+    """
+    Select N files from the database, one at a time.
+    Enable do_show to display the images.
+    """
     client = FastSerializer("localhost", 21212)
     proc = VoltProcedure( client, "Select", [FastSerializer.VOLTTYPE_STRING])
 
@@ -79,13 +81,16 @@ def vdb_select(N_FILES, do_show=False):
 
 
 def vdb_multiselect():
+    """ Select multiple files from the database at the same time. """
     t1 = time.time()
     os.system("sqlcmd --query='SELECT * FROM CAT;' > /dev/null")
     t2 = time.time()
     tot_time = t2-t1
     return tot_time
 
+
 def vdb_delete(N_FILES):
+    """ Delete N files from the database, one at a time. """
     client = FastSerializer("localhost", 21212)
     proc = VoltProcedure( client, "Delete", [FastSerializer.VOLTTYPE_STRING])
 
@@ -101,6 +106,7 @@ def vdb_delete(N_FILES):
 
 
 def vdb_multidelete():
+    """ Delete multiple files from the database at the same time. """
     t1 = time.time()
     os.system("sqlcmd --query='DELETE FROM CAT;' > /dev/null")
     t2 = time.time()
@@ -109,12 +115,14 @@ def vdb_multidelete():
 
 
 def plot_img(image):
+    """ Plot the input image. """
     pil_img = Image.open(io.BytesIO(image))
     plt.imshow(pil_img)
     plt.show()
 
 
 def postprocess(data):
+    """ Converts a string-converted and partitioned image into binary. """
     data = [x for x in data[1:] if x is not None]
     data = ''.join(data)
     data = bytes.fromhex(data)
